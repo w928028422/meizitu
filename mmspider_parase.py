@@ -35,7 +35,7 @@ def get_list_info(url,page,mmpath):
     return href
 
 #对一个标题的所有图片进行爬取
-def get_page_from(channel,pages):
+def get_page_from(channel,pages=1):
     channel=channel+'/page/{}'.format(pages)
     web_data=requests.get(channel)
     soup=BeautifulSoup(web_data.text,'lxml')
@@ -59,3 +59,17 @@ def get_page_from(channel,pages):
         href = get_list_info(lists.get('href'),1,path)
         for i in range(2, int(size)):
             href = get_list_info(href,i,path)
+
+#从一个专题中对所有页数爬取
+def get_pages_from(channel):
+    url = requests.get(channel)
+    soup = BeautifulSoup(url.text,'lxml')
+    lst = soup.select('body > div.main > div.main-content > div.postlist > nav > div > a')
+    string = str(lst)
+    try:
+        r = re.findall(r'\d+',string)
+        size = max(r)
+        for i in range(1,int(size)):
+            get_page_from(channel,i)
+    except:
+        pass
